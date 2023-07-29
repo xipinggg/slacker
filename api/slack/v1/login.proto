@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package api.slack.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "slacker/api/slack/v1;v1";
+
+service Login {
+	rpc Login (LoginRequest) returns (LoginReply) {
+		option (google.api.http) = {
+			post: "/v1/login"
+			body: "*"
+		};
+	}
+}
+
+message LoginRequest {
+	string id = 1 [(validate.rules).string.max_len = 32];
+}
+
+message LoginReply {
+	string token = 1;
+}

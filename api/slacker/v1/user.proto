@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package api.slacker.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "slacker/api/slacker/v1;v1";
+
+service User {
+	rpc Login (LoginRequest) returns (LoginReply) {
+		option (google.api.http) = {
+			post: "/v1/login"
+			body: "*"
+		};
+	}
+}
+
+message LoginRequest {
+	string code = 1 [(validate.rules).string.max_len = 32];
+}
+
+message LoginReply {
+		UserInfo user = 1;
+		TokenInfo token = 2;
+}
+
+message UserInfo {
+  string id = 1;
+	string name = 2;
+}
+
+message TokenInfo {
+	string value = 1;
+	sint64 expires_at = 2 [json_name = "expires_at"];
+}
