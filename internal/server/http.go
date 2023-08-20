@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/metrics"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
@@ -12,9 +11,10 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	jwtv4 "github.com/golang-jwt/jwt/v4"
+	"github.com/go-kratos/swagger-api/openapiv2"
 	"slacker/api/slacker/v1"
 	"slacker/internal/conf"
+	"slacker/internal/pkg/middleware"
 	"slacker/internal/service"
 )
 
@@ -25,38 +25,43 @@ func NewWhiteListMatcher() selector.MatchFunc {
 }
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(logger log.Logger, c *conf.Server, user *service.UserService) *http.Server {
+func NewHTTPServer(logger log.Logger,
+	confServer *conf.Server, confAuth *conf.Auth,
+	user *service.UserService, record *service.RecordService,
+) *http.Server {
+
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
 			tracing.Server(),
 			metrics.Server(),
 			logging.Server(logger),
-			selector.Server(
-				jwt.Server(func(token *jwtv4.Token) (any, error) {
-					return []byte("666"), nil
-				},
-					jwt.WithSigningMethod(jwtv4.SigningMethodHS256),
-					jwt.WithClaims(func() jwtv4.Claims {
-						return &jwtv4.MapClaims{}
-					}))).Match(NewWhiteListMatcher()).Build(),
 			validate.Validator(),
+			selector.Server(middleware.Auth(confAuth)).Match(NewWhiteListMatcher()).Build(),
 		),
 	}
-	if c.Http.Network != "" {
-		opts = append(opts, http.Network(c.Http.Network))
+	if confServer.Http.Network != "" {
+		opts = append(opts, http.Network(confServer.Http.Network))
 	}
-	if c.Http.Addr != "" {
-		opts = append(opts, http.Address(c.Http.Addr))
+	if confServer.Http.Addr != "" {
+		opts = append(opts, http.Address(confServer.Http.Addr))
 	}
-	if c.Http.Timeout != nil {
-		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
+	if confServer.Http.Timeout != nil {
+		opts = append(opts, http.Timeout(confServer.Http.Timeout.AsDuration()))
 	}
 
 	srv := http.NewServer(opts...)
+	// 注册框架接口路由
+	{
+		// swagger ui, path: /q/swagger-ui
+		srv.HandlePrefix("/q/", openapiv2.NewHandler())
+	}
 	// 注册应用层服务
 	{
+		// 用户管理
 		v1.RegisterUserHTTPServer(srv, user)
+		// 打卡管理
+		v1.RegisterRecordHTTPServer(srv, record)
 	}
 
 	return srv

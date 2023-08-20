@@ -11,6 +11,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"slacker/internal/biz"
 	"slacker/internal/conf"
+	"slacker/internal/data"
 	"slacker/internal/server"
 	"slacker/internal/service"
 )
@@ -22,12 +23,20 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(logger log.Logger, confServer *conf.Server, data *conf.Data, auth *conf.Auth) (*kratos.App, func(), error) {
-	grpcServer := server.NewGRPCServer(confServer, logger)
-	userUseCase := biz.NewUserUseCase(logger)
-	userService := service.NewUserService(logger, userUseCase)
-	httpServer := server.NewHTTPServer(logger, confServer, userService)
-	app := newApp(logger, grpcServer, httpServer)
+func wireApp(logger log.Logger, confServer *conf.Server, confData *conf.Data, auth *conf.Auth) (*kratos.App, func(), error) {
+	dataData, cleanup, err := data.NewData(confData, logger)
+	if err != nil {
+		return nil, nil, err
+	}
+	userRepo := data.NewUserRepo(dataData, logger)
+	userUseCase := biz.NewUserUseCase(logger, userRepo)
+	userService := service.NewUserService(logger, userUseCase, auth)
+	recordRepo := data.NewRecordRepo(dataData, logger)
+	recordUseCase := biz.NewRecordUseCase(logger, recordRepo)
+	recordService := service.NewRecordService(logger, recordUseCase)
+	httpServer := server.NewHTTPServer(logger, confServer, auth, userService, recordService)
+	app := newApp(logger, httpServer)
 	return app, func() {
+		cleanup()
 	}, nil
 }

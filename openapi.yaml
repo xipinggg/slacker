@@ -3,19 +3,19 @@
 
 openapi: 3.0.3
 info:
-    title: User API
+    title: Record API
     version: 0.0.1
 paths:
-    /v1/login:
+    /v1/record:
         post:
             tags:
-                - User
-            operationId: User_Login
+                - Record
+            operationId: Record_BeginRecord
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/LoginRequest'
+                            $ref: '#/components/schemas/BeginRecordRequest'
                 required: true
             responses:
                 "200":
@@ -23,7 +23,37 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/LoginReply'
+                                $ref: '#/components/schemas/BeginRecordReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/record/{id}:
+        post:
+            tags:
+                - Record
+            operationId: Record_EndRecord
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/EndRecordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/EndRecordReply'
                 default:
                     description: Default error response
                     content:
@@ -32,6 +62,39 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
+        BeginRecordReply:
+            type: object
+            properties:
+                id:
+                    type: string
+                type:
+                    type: string
+                begin_time:
+                    type: string
+                    format: date-time
+        BeginRecordRequest:
+            type: object
+            properties:
+                type:
+                    type: string
+        EndRecordReply:
+            type: object
+            properties:
+                id:
+                    type: string
+                type:
+                    type: string
+                begin_time:
+                    type: string
+                    format: date-time
+                end_time:
+                    type: string
+                    format: date-time
+        EndRecordRequest:
+            type: object
+            properties:
+                id:
+                    type: string
         GoogleProtobufAny:
             type: object
             properties:
@@ -40,18 +103,6 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        LoginReply:
-            type: object
-            properties:
-                user:
-                    $ref: '#/components/schemas/UserInfo'
-                token:
-                    $ref: '#/components/schemas/TokenInfo'
-        LoginRequest:
-            type: object
-            properties:
-                code:
-                    type: string
         Status:
             type: object
             properties:
@@ -68,20 +119,5 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
-        TokenInfo:
-            type: object
-            properties:
-                value:
-                    type: string
-                expires_at:
-                    type: integer
-                    format: sint64
-        UserInfo:
-            type: object
-            properties:
-                id:
-                    type: string
-                name:
-                    type: string
 tags:
-    - name: User
+    - name: Record

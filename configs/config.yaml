@@ -1,19 +1,22 @@
 server:
   http:
-    addr: 0.0.0.0:21283
-    timeout: 1s
+    addr: 0.0.0.0:10001
+    timeout: 10s
   grpc:
-    addr: 0.0.0.0:9000
-    timeout: 1s
+    addr: 0.0.0.0:10002
+    timeout: 10s
 data:
   database:
-    driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test
+    driver: postgres
+    source: #{replace@data.database.source}
   redis:
     addr: 127.0.0.1:6379
-    read_timeout: 0.2s
-    write_timeout: 0.2s
+    read_timeout: 1s
+    write_timeout: 1s
+  wx:
+    id: #{replace@data.wx.id}
+    secret: #{replace@data.wx.secret}
 auth:
-  secret_key: "test-key"
+  secret_key: #{replace@dauth.secret_key}
   expires_time: 3600s
   method: "256"

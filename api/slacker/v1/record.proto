@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package api.slacker.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+option go_package = "slacker/api/slacker/v1;v1";
+
+service Record {
+  rpc BeginRecord (BeginRecordRequest) returns (BeginRecordReply) {
+    option (google.api.http) = {
+      post: "/v1/record"
+      body: "*"
+    };
+  }
+  rpc EndRecord (EndRecordRequest) returns (EndRecordReply) {
+    option (google.api.http) = {
+      post: "/v1/record/{id}"
+      body: "*"
+    };
+  }
+}
+
+message BeginRecordRequest {
+	string type = 1;
+}
+
+message BeginRecordReply {
+  string id = 1;
+  string type = 2;
+  google.protobuf.Timestamp begin_time = 3 [json_name = "begin_time"];
+}
+
+message EndRecordRequest {
+	string id = 1;
+}
+
+message EndRecordReply {
+  string id = 1;
+  string type = 2;
+  google.protobuf.Timestamp begin_time = 3 [json_name = "begin_time"];
+  google.protobuf.Timestamp end_time = 4 [json_name = "end_time"];
+}

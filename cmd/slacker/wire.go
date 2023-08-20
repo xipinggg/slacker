@@ -8,6 +8,7 @@ package main
 import (
 	"slacker/internal/biz"
 	"slacker/internal/conf"
+	"slacker/internal/data"
 	"slacker/internal/server"
 	"slacker/internal/service"
 
@@ -18,5 +19,5 @@ import (
 
 // wireApp init kratos application.
 func wireApp(log.Logger, *conf.Server, *conf.Data, *conf.Auth) (*kratos.App, func(), error) {
-	panic(wire.Build(server.ProviderSet, biz.ProviderSet, service.ProviderSet, newApp))
+	panic(wire.Build(server.ProviderSet, data.ProviderSet, biz.ProviderSet, service.ProviderSet, newApp))
 }
