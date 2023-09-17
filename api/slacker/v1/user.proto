@@ -27,7 +27,6 @@ message LoginReply {
 
 message UserInfo {
   string id = 1;
-	string name = 2;
 }
 
 message TokenInfo {

@@ -51,11 +51,17 @@ func NewHTTPServer(logger log.Logger,
 	}
 
 	srv := http.NewServer(opts...)
+
 	// 注册框架接口路由
 	{
 		// swagger ui, path: /q/swagger-ui
 		srv.HandlePrefix("/q/", openapiv2.NewHandler())
+		// healthz
+		srv.Route("/").GET("/healthz", func(c http.Context) error {
+			return c.Result(200, nil)
+		})
 	}
+
 	// 注册应用层服务
 	{
 		// 用户管理

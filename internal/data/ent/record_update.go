@@ -34,6 +34,20 @@ func (ru *RecordUpdate) SetEndTime(t time.Time) *RecordUpdate {
 	return ru
 }
 
+// SetNillableEndTime sets the "end_time" field if the given value is not nil.
+func (ru *RecordUpdate) SetNillableEndTime(t *time.Time) *RecordUpdate {
+	if t != nil {
+		ru.SetEndTime(*t)
+	}
+	return ru
+}
+
+// ClearEndTime clears the value of the "end_time" field.
+func (ru *RecordUpdate) ClearEndTime() *RecordUpdate {
+	ru.mutation.ClearEndTime()
+	return ru
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (ru *RecordUpdate) SetUpdatedAt(t time.Time) *RecordUpdate {
 	ru.mutation.SetUpdatedAt(t)
@@ -92,6 +106,9 @@ func (ru *RecordUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ru.mutation.EndTime(); ok {
 		_spec.SetField(record.FieldEndTime, field.TypeTime, value)
 	}
+	if ru.mutation.EndTimeCleared() {
+		_spec.ClearField(record.FieldEndTime, field.TypeTime)
+	}
 	if value, ok := ru.mutation.UpdatedAt(); ok {
 		_spec.SetField(record.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -118,6 +135,20 @@ type RecordUpdateOne struct {
 // SetEndTime sets the "end_time" field.
 func (ruo *RecordUpdateOne) SetEndTime(t time.Time) *RecordUpdateOne {
 	ruo.mutation.SetEndTime(t)
+	return ruo
+}
+
+// SetNillableEndTime sets the "end_time" field if the given value is not nil.
+func (ruo *RecordUpdateOne) SetNillableEndTime(t *time.Time) *RecordUpdateOne {
+	if t != nil {
+		ruo.SetEndTime(*t)
+	}
+	return ruo
+}
+
+// ClearEndTime clears the value of the "end_time" field.
+func (ruo *RecordUpdateOne) ClearEndTime() *RecordUpdateOne {
+	ruo.mutation.ClearEndTime()
 	return ruo
 }
 
@@ -208,6 +239,9 @@ func (ruo *RecordUpdateOne) sqlSave(ctx context.Context) (_node *Record, err err
 	}
 	if value, ok := ruo.mutation.EndTime(); ok {
 		_spec.SetField(record.FieldEndTime, field.TypeTime, value)
+	}
+	if ruo.mutation.EndTimeCleared() {
+		_spec.ClearField(record.FieldEndTime, field.TypeTime)
 	}
 	if value, ok := ruo.mutation.UpdatedAt(); ok {
 		_spec.SetField(record.FieldUpdatedAt, field.TypeTime, value)

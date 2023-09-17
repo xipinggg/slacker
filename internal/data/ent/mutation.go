@@ -275,7 +275,7 @@ func (m *RecordMutation) EndTime() (r time.Time, exists bool) {
 // OldEndTime returns the old "end_time" field's value of the Record entity.
 // If the Record object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RecordMutation) OldEndTime(ctx context.Context) (v time.Time, err error) {
+func (m *RecordMutation) OldEndTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldEndTime is only allowed on UpdateOne operations")
 	}
@@ -289,9 +289,22 @@ func (m *RecordMutation) OldEndTime(ctx context.Context) (v time.Time, err error
 	return oldValue.EndTime, nil
 }
 
+// ClearEndTime clears the value of the "end_time" field.
+func (m *RecordMutation) ClearEndTime() {
+	m.end_time = nil
+	m.clearedFields[record.FieldEndTime] = struct{}{}
+}
+
+// EndTimeCleared returns if the "end_time" field was cleared in this mutation.
+func (m *RecordMutation) EndTimeCleared() bool {
+	_, ok := m.clearedFields[record.FieldEndTime]
+	return ok
+}
+
 // ResetEndTime resets all changes to the "end_time" field.
 func (m *RecordMutation) ResetEndTime() {
 	m.end_time = nil
+	delete(m.clearedFields, record.FieldEndTime)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -347,7 +360,7 @@ func (m *RecordMutation) UpdatedAt() (r time.Time, exists bool) {
 // OldUpdatedAt returns the old "updated_at" field's value of the Record entity.
 // If the Record object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RecordMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *RecordMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -540,7 +553,11 @@ func (m *RecordMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *RecordMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(record.FieldEndTime) {
+		fields = append(fields, record.FieldEndTime)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -553,6 +570,11 @@ func (m *RecordMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *RecordMutation) ClearField(name string) error {
+	switch name {
+	case record.FieldEndTime:
+		m.ClearEndTime()
+		return nil
+	}
 	return fmt.Errorf("unknown Record nullable field %s", name)
 }
 

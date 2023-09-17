@@ -47,8 +47,7 @@ func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 
 	return &pb.LoginReply{
 		User: &pb.UserInfo{
-			Id:   string(user.ID),
-			Name: user.Name,
+			Id: string(user.ID),
 		},
 		Token: &pb.TokenInfo{
 			Value:     token,

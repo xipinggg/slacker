@@ -53,6 +53,14 @@ func (rc *RecordCreate) SetEndTime(t time.Time) *RecordCreate {
 	return rc
 }
 
+// SetNillableEndTime sets the "end_time" field if the given value is not nil.
+func (rc *RecordCreate) SetNillableEndTime(t *time.Time) *RecordCreate {
+	if t != nil {
+		rc.SetEndTime(*t)
+	}
+	return rc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (rc *RecordCreate) SetCreatedAt(t time.Time) *RecordCreate {
 	rc.mutation.SetCreatedAt(t)
@@ -159,9 +167,6 @@ func (rc *RecordCreate) check() error {
 	if _, ok := rc.mutation.BeginTime(); !ok {
 		return &ValidationError{Name: "begin_time", err: errors.New(`ent: missing required field "Record.begin_time"`)}
 	}
-	if _, ok := rc.mutation.EndTime(); !ok {
-		return &ValidationError{Name: "end_time", err: errors.New(`ent: missing required field "Record.end_time"`)}
-	}
 	if _, ok := rc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Record.created_at"`)}
 	}
@@ -217,7 +222,7 @@ func (rc *RecordCreate) createSpec() (*Record, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := rc.mutation.EndTime(); ok {
 		_spec.SetField(record.FieldEndTime, field.TypeTime, value)
-		_node.EndTime = value
+		_node.EndTime = &value
 	}
 	if value, ok := rc.mutation.CreatedAt(); ok {
 		_spec.SetField(record.FieldCreatedAt, field.TypeTime, value)
@@ -225,7 +230,7 @@ func (rc *RecordCreate) createSpec() (*Record, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := rc.mutation.UpdatedAt(); ok {
 		_spec.SetField(record.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+		_node.UpdatedAt = &value
 	}
 	return _node, _spec
 }

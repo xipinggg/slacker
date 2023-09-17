@@ -42,7 +42,7 @@ func (s *RecordService) BeginRecord(ctx context.Context, req *pb.BeginRecordRequ
 }
 
 func (s *RecordService) EndRecord(ctx context.Context, req *pb.EndRecordRequest) (*pb.EndRecordReply, error) {
-	record, err := s.uc.EndRecord(ctx, req.Id)
+	record, err := s.uc.EndRecord(ctx, req.Id, req.GetDuration().AsDuration())
 	if err != nil {
 		return nil, err
 	}
@@ -50,6 +50,6 @@ func (s *RecordService) EndRecord(ctx context.Context, req *pb.EndRecordRequest)
 	return &pb.EndRecordReply{
 		Id:        record.ID,
 		BeginTime: timestamppb.New(record.BeginTime),
-		EndTime:   timestamppb.New(record.EndTime),
+		EndTime:   timestamppb.New(*record.EndTime),
 	}, nil
 }

@@ -295,6 +295,16 @@ func EndTimeLTE(v time.Time) predicate.Record {
 	return predicate.Record(sql.FieldLTE(FieldEndTime, v))
 }
 
+// EndTimeIsNil applies the IsNil predicate on the "end_time" field.
+func EndTimeIsNil() predicate.Record {
+	return predicate.Record(sql.FieldIsNull(FieldEndTime))
+}
+
+// EndTimeNotNil applies the NotNil predicate on the "end_time" field.
+func EndTimeNotNil() predicate.Record {
+	return predicate.Record(sql.FieldNotNull(FieldEndTime))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Record {
 	return predicate.Record(sql.FieldEQ(FieldCreatedAt, v))

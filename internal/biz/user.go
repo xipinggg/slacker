@@ -18,7 +18,6 @@ type (
 // User 用户信息
 type User struct {
 	ID         UserIDType // 用户id
-	Name       string     // 用户名
 	SessionKey string     // 用户密钥
 }
 
@@ -53,7 +52,6 @@ func (uc *UserUseCase) Login(ctx context.Context, code LoginCodeType) (*User, er
 
 	return &User{
 		ID:         UserIDType(result.ID),
-		Name:       "unknown", // todo 不知道怎么获取
 		SessionKey: result.SessionKey,
 	}, nil
 }

@@ -2,13 +2,11 @@ package data
 
 import (
 	"context"
-	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"slacker/internal/biz"
 	"slacker/internal/data/ent"
-	entrecord "slacker/internal/data/ent/record"
 	"slacker/internal/pkg/util/errutil"
 )
 
@@ -29,6 +27,7 @@ func (r *RecordRepo) SaveRecord(ctx context.Context, record *biz.Record) (*biz.R
 		Create().
 		SetCreatorID(record.CreatorID).
 		SetType(record.Type).
+		SetBeginTime(record.BeginTime).
 		Save(ctx)
 	if err != nil {
 		return nil, errutil.WithStack(err)
@@ -45,8 +44,7 @@ func (r *RecordRepo) UpdateRecord(ctx context.Context, record *biz.Record) (*biz
 
 	rc, err := r.data.DBClient.Record.
 		UpdateOneID(id).
-		SetEndTime(record.EndTime).
-		Where(entrecord.EndTimeNEQ(time.Time{})).
+		SetEndTime(*record.EndTime).
 		Save(ctx)
 	if err != nil {
 		return nil, errutil.Wrap(err, "update by id failed: %s", record.ID)

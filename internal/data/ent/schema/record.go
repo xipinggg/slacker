@@ -21,9 +21,9 @@ func (Record) Fields() []ent.Field {
 		field.String("creator_id").Immutable(),
 		field.String("type").Immutable(),
 		field.Time("begin_time").Default(time.Now).Immutable(),
-		field.Time("end_time"),
+		field.Time("end_time").Nillable().Optional(),
 		field.Time("created_at").Default(time.Now).Immutable(),
-		field.Time("updated_at").Default(time.Now),
+		field.Time("updated_at").Nillable().Default(time.Now),
 	}
 }
 

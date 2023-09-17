@@ -1,0 +1,11 @@
+[Unit]
+Description=slacker	    #当前配置文件的描述信息
+
+[Service]
+Type=forking			                        #定义启动类型
+ExecStart=/root/projects/slacker/cmd/slacker/slacker -conf /root/projects/slacker/configs #定义启动进程时执行的命令
+ExecReload=/root/projects/slacker/cmd/slacker/slacker -conf /root/projects/slacker/configs 	#定义启动进程时执行的命令
+PrivateTmp=true						#是否分配独立空间
+
+[Install]
+WantedBy=multi-user.target    #表示多用户命令行状态

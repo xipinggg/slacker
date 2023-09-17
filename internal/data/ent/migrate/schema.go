@@ -14,7 +14,7 @@ var (
 		{Name: "creator_id", Type: field.TypeString},
 		{Name: "type", Type: field.TypeString},
 		{Name: "begin_time", Type: field.TypeTime},
-		{Name: "end_time", Type: field.TypeTime},
+		{Name: "end_time", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

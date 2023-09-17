@@ -25,11 +25,11 @@ type Record struct {
 	// BeginTime holds the value of the "begin_time" field.
 	BeginTime time.Time `json:"begin_time,omitempty"`
 	// EndTime holds the value of the "end_time" field.
-	EndTime time.Time `json:"end_time,omitempty"`
+	EndTime *time.Time `json:"end_time,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	UpdatedAt    *time.Time `json:"updated_at,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -87,7 +87,8 @@ func (r *Record) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field end_time", values[i])
 			} else if value.Valid {
-				r.EndTime = value.Time
+				r.EndTime = new(time.Time)
+				*r.EndTime = value.Time
 			}
 		case record.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -99,7 +100,8 @@ func (r *Record) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				r.UpdatedAt = value.Time
+				r.UpdatedAt = new(time.Time)
+				*r.UpdatedAt = value.Time
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -146,14 +148,18 @@ func (r *Record) String() string {
 	builder.WriteString("begin_time=")
 	builder.WriteString(r.BeginTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("end_time=")
-	builder.WriteString(r.EndTime.Format(time.ANSIC))
+	if v := r.EndTime; v != nil {
+		builder.WriteString("end_time=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(r.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(r.UpdatedAt.Format(time.ANSIC))
+	if v := r.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
+	_ "github.com/lib/pq"
 )
 
 // ProviderSet is data providers.
@@ -34,13 +35,13 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 	// 数据库
 	dbClient, err := newDBClient(c)
 	if err != nil {
-		//return nil, nil, err
+		return nil, nil, err
 	}
 
 	// 微信小程序
 	wxClient, err := newWXClient(c)
 	if err != nil {
-		//return nil, nil, err
+		return nil, nil, err
 	}
 
 	return &Data{
