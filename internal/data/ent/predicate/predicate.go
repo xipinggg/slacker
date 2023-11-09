@@ -8,3 +8,6 @@ import (
 
 // Record is the predicate function for record builders.
 type Record func(*sql.Selector)
+
+// User is the predicate function for user builders.
+type User func(*sql.Selector)

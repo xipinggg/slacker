@@ -10,7 +10,7 @@ import (
 var (
 	// RecordsColumns holds the columns for the "records" table.
 	RecordsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
+		{Name: "id", Type: field.TypeString, Unique: true, Size: 64},
 		{Name: "creator_id", Type: field.TypeString},
 		{Name: "type", Type: field.TypeString},
 		{Name: "begin_time", Type: field.TypeTime},
@@ -31,9 +31,31 @@ var (
 			},
 		},
 	}
+	// UsersColumns holds the columns for the "users" table.
+	UsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true, Size: 64},
+		{Name: "mysql_id", Type: field.TypeInt, Unique: true, SchemaType: map[string]string{"mysql": "INT AUTO_INCREMENT"}},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 64},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+	}
+	// UsersTable holds the schema information for the "users" table.
+	UsersTable = &schema.Table{
+		Name:       "users",
+		Columns:    UsersColumns,
+		PrimaryKey: []*schema.Column{UsersColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "user_mysql_id_id",
+				Unique:  true,
+				Columns: []*schema.Column{UsersColumns[1], UsersColumns[0]},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		RecordsTable,
+		UsersTable,
 	}
 )
 

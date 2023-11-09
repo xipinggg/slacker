@@ -11,7 +11,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // RecordCreate is the builder for creating a Record entity.
@@ -90,15 +89,15 @@ func (rc *RecordCreate) SetNillableUpdatedAt(t *time.Time) *RecordCreate {
 }
 
 // SetID sets the "id" field.
-func (rc *RecordCreate) SetID(u uuid.UUID) *RecordCreate {
-	rc.mutation.SetID(u)
+func (rc *RecordCreate) SetID(s string) *RecordCreate {
+	rc.mutation.SetID(s)
 	return rc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (rc *RecordCreate) SetNillableID(u *uuid.UUID) *RecordCreate {
-	if u != nil {
-		rc.SetID(*u)
+func (rc *RecordCreate) SetNillableID(s *string) *RecordCreate {
+	if s != nil {
+		rc.SetID(*s)
 	}
 	return rc
 }
@@ -173,6 +172,11 @@ func (rc *RecordCreate) check() error {
 	if _, ok := rc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Record.updated_at"`)}
 	}
+	if v, ok := rc.mutation.ID(); ok {
+		if err := record.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Record.id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -188,10 +192,10 @@ func (rc *RecordCreate) sqlSave(ctx context.Context) (*Record, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Record.ID type: %T", _spec.ID.Value)
 		}
 	}
 	rc.mutation.id = &_node.ID
@@ -202,11 +206,11 @@ func (rc *RecordCreate) sqlSave(ctx context.Context) (*Record, error) {
 func (rc *RecordCreate) createSpec() (*Record, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Record{config: rc.config}
-		_spec = sqlgraph.NewCreateSpec(record.Table, sqlgraph.NewFieldSpec(record.FieldID, field.TypeUUID))
+		_spec = sqlgraph.NewCreateSpec(record.Table, sqlgraph.NewFieldSpec(record.FieldID, field.TypeString))
 	)
 	if id, ok := rc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := rc.mutation.CreatorID(); ok {
 		_spec.SetField(record.FieldCreatorID, field.TypeString, value)

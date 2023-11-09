@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"reflect"
 	"slacker/internal/data/ent/record"
+	"slacker/internal/data/ent/user"
 	"sync"
 
 	"entgo.io/ent"
@@ -74,6 +75,7 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			record.Table: record.ValidColumn,
+			user.Table:   user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

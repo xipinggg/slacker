@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	pb "slacker/api/slacker/v1"
-	"slacker/internal/biz"
+	userbiz "slacker/internal/biz/user"
 	"slacker/internal/conf"
 	"slacker/internal/pkg/auth"
 )
@@ -16,10 +16,10 @@ type UserService struct {
 
 	conf   *conf.Auth
 	logger *log.Helper
-	uc     *biz.UserUseCase
+	uc     *userbiz.UseCase
 }
 
-func NewUserService(l log.Logger, uc *biz.UserUseCase, confAuth *conf.Auth) *UserService {
+func NewUserService(l log.Logger, uc *userbiz.UseCase, confAuth *conf.Auth) *UserService {
 	return &UserService{
 		conf:   confAuth,
 		logger: log.NewHelper(l),
@@ -28,7 +28,7 @@ func NewUserService(l log.Logger, uc *biz.UserUseCase, confAuth *conf.Auth) *Use
 }
 
 func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginReply, error) {
-	user, err := s.uc.Login(ctx, biz.LoginCodeType(req.Code))
+	root, err := s.uc.Login(ctx, req.Code)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +37,8 @@ func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 	expires := s.conf.GetExpiresTime().AsDuration()
 
 	u := &auth.User{
-		ID:         string(user.ID),
-		SessionKey: user.SessionKey,
+		ID:         root.ID(),
+		SessionKey: root.SessionKey(),
 	}
 	token, err := auth.CreateToken(s.conf, u, now, expires)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 
 	return &pb.LoginReply{
 		User: &pb.UserInfo{
-			Id: string(user.ID),
+			Id: root.ID(),
 		},
 		Token: &pb.TokenInfo{
 			Value:     token,

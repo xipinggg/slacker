@@ -10,14 +10,13 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 )
 
 // Record is the model entity for the Record schema.
 type Record struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// CreatorID holds the value of the "creator_id" field.
 	CreatorID string `json:"creator_id,omitempty"`
 	// Type holds the value of the "type" field.
@@ -38,12 +37,10 @@ func (*Record) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case record.FieldCreatorID, record.FieldType:
+		case record.FieldID, record.FieldCreatorID, record.FieldType:
 			values[i] = new(sql.NullString)
 		case record.FieldBeginTime, record.FieldEndTime, record.FieldCreatedAt, record.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case record.FieldID:
-			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -60,10 +57,10 @@ func (r *Record) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case record.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				r.ID = *value
+			} else if value.Valid {
+				r.ID = value.String
 			}
 		case record.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullString); !ok {

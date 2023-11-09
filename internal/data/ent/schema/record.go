@@ -17,7 +17,7 @@ type Record struct {
 // Fields of the Record.
 func (Record) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).Default(uuid.New).Immutable(),
+		field.String("id").Unique().Immutable().MinLen(2).MaxLen(64).DefaultFunc(uuid.NewString),
 		field.String("creator_id").Immutable(),
 		field.String("type").Immutable(),
 		field.Time("begin_time").Default(time.Now).Immutable(),

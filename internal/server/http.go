@@ -25,9 +25,12 @@ func NewWhiteListMatcher() selector.MatchFunc {
 }
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(logger log.Logger,
-	confServer *conf.Server, confAuth *conf.Auth,
-	user *service.UserService, record *service.RecordService,
+func NewHTTPServer(
+	logger log.Logger,
+	confServer *conf.Server,
+	confAuth *conf.Auth,
+	user *service.UserService,
+	record *service.RecordService,
 ) *http.Server {
 
 	var opts = []http.ServerOption{
