@@ -8,14 +8,14 @@ server:
 data:
   database:
     driver: postgres
-    source: "host=127.0.0.1 port=5432 user=postgres password=123456 dbname=postgres sslmode=disable"  #{replace@data.database.source}
+    source: ""  #{replace@data.database.source}
   redis:
     addr: 127.0.0.1:6379
     read_timeout: 1s
     write_timeout: 1s
   wx:
     id: wxfc042c932a156bec #{replace@data.wx.id}
-    secret: 81528e36481fb3245c99067274afc041  #{replace@data.wx.secret}
+    secret: ""  #{replace@data.wx.secret}
 auth:
   secret_key: teststsetstsetsetse #{replace@dauth.secret_key}
   expires_time: 360000s
